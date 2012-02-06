@@ -233,6 +233,24 @@ webview.init_funcs = {
         view:add_signal("resource-request-starting", function(v, uri)
             info("Requesting: %s", uri)
             -- Return false to cancel the request.
+            -- Return uri to redirect the request.
+
+            -- allow to load local files from liakit's cache and data dirs
+            local u = lousy.uri.parse(uri)
+            if (u and type(u.scheme) == "string") then
+                local path
+                if (u.scheme == "luakit.cache") then
+                    path = luakit.cache_dir..'/'..uri:sub(16, -1)
+                elseif (u.scheme == "luakit.data") then
+                    local path = luakit.data_dir..'/'..uri:sub(15, -1)
+                    if not lousy.util.os.exists(path) then
+                        path = luakit.install_dir..'/'..uri:sub(15, -1)
+                    end
+                end
+                if (path and os.exists(path)) then
+                    return "file://"..path
+                end
+            end
         end)
     end,
 }
