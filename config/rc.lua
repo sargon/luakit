@@ -125,6 +125,10 @@ require "completion"
 -- domain_props table (in config/globals.lua) as this module will conflict.
 --require "noscript"
 
+-- LockDown plugin, control over resource request. This plugin integrates
+-- the functionality of the NoScript plugin.
+-- require "lockdown"
+
 require "follow_selected"
 require "go_input"
 require "go_next_prev"
