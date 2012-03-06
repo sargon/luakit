@@ -7,5 +7,6 @@
 require "lockdown.access"
 require "lockdown.cache"
 require "lockdown.record"
+require "lockdown.signals"
 
 module("lockdown")
