@@ -4,6 +4,7 @@
 -------------------------------------------------------
 
 local access = require "lockdown.access"
+local db     = require "lockdown.database"
 local util   = require "lockdown.util"
 local record = require "lockdown.record"
 local webview = webview
@@ -28,6 +29,19 @@ webview.init_funcs.lockdown_init = function (view,window)
   view:add_signal("load-status", function (v,status)
     current.status = status
     if v.uri == nil or status == nil then return end
+
+    -- NoScript: script and plugin handling
+    if status == "committed" and v.uri ~= "about:blank" then
+      local enable_scripts = access.config.defaultAllowScript
+      local enable_plugins = access.config.defaultAllowPlugins
+      local row            = db.nsMatchDomain(current.hostname)
+      if row then
+        enable_scripts = row.enable_scripts
+        enable_plugins = row.enable_plugins
+      end
+      v.enable_scripts = enable_scripts
+      v.enable_plugins = enable_plugins
+    end
   end)
 
   -- decide on resource requests
