@@ -45,3 +45,11 @@ function isSLDSubDomain(host,domain)
   sldOfHost = string.match(host,"([^%.]+%.[^%.]+)$")
   return sldOfHost == sld
 end
+
+function boolToColor(bool)
+  if bool then 
+    return "green"
+  else 
+    return "red"
+  end
+end
