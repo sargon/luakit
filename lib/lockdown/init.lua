@@ -6,6 +6,7 @@
 
 require "lockdown.access"
 require "lockdown.cache"
+require "lockdown.database"
 require "lockdown.record"
 require "lockdown.signals"
 

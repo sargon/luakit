@@ -4,10 +4,20 @@
 -------------------------------------------------------
 local assert = assert 
 local string = string
+local tonumber = tonumber
 
 local lousy = require "lousy"
 
 module("lockdown.util")
+
+
+function boolToInt(bool) 
+  return bool and 1 or 0
+end
+
+function intToBool(int) 
+  return tonumber(int) ~= 0 
+end
 
 function uriParse(uri)
   return assert(lousy.uri.parse(uri), "malformed uri")
