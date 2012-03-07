@@ -29,17 +29,37 @@ new_mode("lockdown_tracked_requests", {
         local view     = wv.view
 
         -- Script and Plugin settings
-        local enable_scripts = access.config.defaultAllowScript
-        local enable_plugins = access.config.defaultAllowPlugins
-        local nsrow  = db.nsMatchDomain(domain)
-        if nsrow then
-          enable_scripts = nsrow.enable_scripts
-          enable_plugins = nsrow.enable_plugins
+        local function arePluginsEnabled()
+          local enable_plugins = access.config.defaultAllowPlugins
+          local nsrow  = db.nsMatchDomain(hostname)
+
+          if nsrow then
+            enable_plugins = nsrow.enable_plugins
+          end
+          return string.format( "<span foreground=\"%s\">Plugins %sabled</span>"
+                              , util.boolToColor(enable_plugins)
+                              , enable_plugins and "En" or "Dis"
+                              )
         end
 
+        local function areScriptsEnabled()
+          local enable_scripts = access.config.defaultAllowScript
+          local nsrow  = db.nsMatchDomain(hostname)
+
+          if nsrow then
+            enable_scripts = nsrow.enable_scripts
+          end
+          return string.format( "<span foreground=\"%s\">Scripts %sabled</span>"
+                              , util.boolToColor(enable_scripts)
+                              , enable_scripts and "En" or "Dis"
+                              )
+        end
+
+
+        local rows = {{arePluginsEnabled, plugin = true }
+                     ,{areScriptsEnabled, script = true } 
+
         -- Build plugin/script entries
-        local rows = {{string.format("<span foreground=\"%s\">Plugins %sabled</span>",util.boolToColor(enable_plugins),enable_plugins and "En" or "Dis"), plugin = enable_plugins}
-                     ,{string.format("<span foreground=\"%s\">Scripts %sabled</span>",util.boolToColor(enable_scripts),enable_scripts and "En" or "Dis"), script = enable_scripts}
                      ,{ ":: domain","reason",title = true }}
 
         -- Build domain/hosts + paths list
