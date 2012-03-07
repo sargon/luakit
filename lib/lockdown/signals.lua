@@ -81,3 +81,39 @@ webview.init_funcs.lockdown_init = function (view,window)
     end
   end)
 end
+
+function webview.methods.toggle_scripts(view, w,doNotify)
+    local uri    = util.uriParse(view.uri)
+    local domain = util.getHostname(uri)
+    local enable_scripts = access.config.defaultAllowScript
+    local row  = db.nsMatchDomain(domain)
+
+    if row then
+        db.nsUpdate(row.id, "enable_scripts", not row.enable_scripts)
+    else
+        db.nsInsert(domain, not enable_scripts, access.config.defaultAllowPlugins)
+    end
+    
+    if doNotify then
+      w:notify(string.format("%sabled scripts for domain: %s",
+        enable_scripts and "Dis" or "En", domain))
+    end
+end
+
+function webview.methods.toggle_plugins(view, w,doNotify)
+    local uri    = util.uriParse(view.uri)
+    local domain = util.getHostname(uri)
+    local enable_scripts = access.config.defaultAllowScript
+    local row  = db.nsMatchDomain(domain)
+
+    if row then
+        db.nsUpdate(row.id, "enable_plugins", not row.enable_plugins)
+    else
+        db.nsInsert(domain, access.config.defaultAllowScript, not enable_plugins)
+    end
+
+    if doNotify then
+      w:notify(string.format("%sabled plugins for domain: %s",
+        enable_plugins and "Dis" or "En", domain))
+    end
+end
