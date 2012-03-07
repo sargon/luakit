@@ -128,13 +128,17 @@ require "completion"
 -- domain_props table (in config/globals.lua) as this module will conflict.
 --require "noscript"
 
+-- LockDown plugin, control over resource request. This plugin integrates
+-- the functionality of the NoScript plugin.
+require "lockdown"
+
 require "autozoom"
 autozoom.level   = 1.0
 autozoom.text    = "(zoom:{level}%,{full_content})"
 autozoom.visible = "non-default"
 --autozoom.full_content = true
 --autozoom.autowrite = false
-
+--
 require "follow_selected"
 require "go_input"
 require "go_next_prev"
