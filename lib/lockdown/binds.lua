@@ -37,11 +37,13 @@ add_binds("lockdown_tracked_requests", lousy.util.table.join({
     end),
     key({}, "t", function(w) 
       local row = w.menu:get()
-      if row and row.plugin ~= nil then
-        --w:toggle_plugins()
+      if row and row.script then
+        w:toggle_scripts(false)
+        w.menu:update()
       end
-      if row and row.script ~= nil then
-        --w:toggle_scripts()
+      if row and row.plugin then
+        w:toggle_plugins(false)
+        w.menu:update()
       end
       if row and row.path and row.request and row.domain then
         local hostname = w.view.uri
