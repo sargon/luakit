@@ -108,16 +108,6 @@ function setPath(domain,path,allowed)
     }
 end
 
-function togglePath(domain,path)
-  local get = getPath(domain,path)
-  if get and get.value then
-      setPath(domain,path,not get.value)
-  else
-      setPath(domain,path, true)
-  end
-
-end
-
 function getPath(domain,path)
   if cache.paths[domain] and cache.paths[domain][path] then
     return cache.paths[domain][path]
@@ -130,4 +120,19 @@ function resetPath(domain,path)
     { value   = nil
     , changed = "reset"
     }
+end
+
+function togglePathWhiteList(hostname,domain,path)
+  local valPath       = getPath(domain,path)
+  local valPathByHost = getPathByHost(hostname,domain,path)
+  if valPath and valPath.value then
+      resetPath(domain,path)
+  else
+    if valPathByHost and valPathByHost.value then
+      resetPathByHost(hostname,domain,path)
+      setPath(domain,path, true)
+    else
+      setPathByHost(hostname,domain,path,true)
+    end
+  end
 end
