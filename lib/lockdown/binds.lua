@@ -8,6 +8,7 @@ local lousy   = require "lousy"
 local cache   = require "lockdown.cache"
 local access  = require "lockdown.access"
 local record  = require "lockdown.record"
+local util    = require "lockdown.util"
 local add_binds = add_binds
 local add_cmds = add_cmds
 local new_mode = new_mode
@@ -39,19 +40,26 @@ add_binds("lockdown_tracked_requests", lousy.util.table.join({
       local row = w.menu:get()
       if row and row.script then
         w:toggle_scripts(false)
-        w.menu:update()
       end
       if row and row.plugin then
         w:toggle_plugins(false)
-        w.menu:update()
       end
-      if row and row.path and row.request and row.domain then
-        local hostname = w.view.uri
-        cache.togglePath(row.domain,row.path)
-        local accessRes = access.evaluate(hostname,row.request)
-        record.addRequest(w.view,row.request,accessRes)
-        w.menu:update()
+      if row and row.domain then
+        local hostURI  = w.view.uri
+        local uri      = util.uriParse(w.view.uri)
+        local domain   = row.domain 
+        local hostname = util.getHostname(uri) 
+
+        if row.path and row.request then
+          local path = row.path
+          cache.togglePathWhiteList(hostname,domain,path)
+          local accessRes = access.evaluate(hostURI,row.request)
+          record.addRequest(w.view,row.request,accessRes)
+        else 
+          cache.toggleDomainWhiteList(hostname,domain)
+        end
       end
+      w.menu:update()
     end),
     -- Exit menu
     key({},  "q", function (w) w:set_mode() end),
