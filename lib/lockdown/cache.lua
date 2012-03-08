@@ -65,7 +65,7 @@ function getPathByHost(hostname,domain,path)
   if cache.hosts[hostname] 
   and cache.hosts[hostname].paths[domain] 
   and cache.hosts[hostname].paths[domain][path] then
-    return cache.hosts[hostname].domains[domain]
+    return cache.hosts[hostname].paths[domain][path]
   end
   return nil
 end
