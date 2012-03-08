@@ -13,16 +13,26 @@ local cache =
   , paths   = {}
   }
 
-function hostNew(hostname) 
-  cache.hosts[hostname] = 
-    { domains = {}
-    , paths   = {}
-    , enable_scripts = nil -- TODO Cache this 
-    , enable_plugins = nil -- TODO Cache this
-    }
+local function checkHostname(hostname) 
+  if not cache.hosts[hostname] then
+    cache.hosts[hostname] = 
+      { domains = {}
+      , paths   = {}
+      , enable_scripts = nil -- TODO Cache this 
+      , enable_plugins = nil -- TODO Cache this
+      }
+  end
+end
+
+local function checkPathByHostname(hostname,domain)
+  checkHostname(hostname)
+  if not cache.hosts[hostname].paths[domain] then
+    cache.hosts[hostname].paths[domain] = {}
+  end
 end
 
 function setDomainByHost(hostname,domain,allowed)
+  checkHostname(hostname)
   cache.hosts[hostname].domains[domain] = 
     { value   = allowed
     , changed = "set"
@@ -44,6 +54,7 @@ function resetDomainByHost(hostname,domain)
 end
 
 function setPathByHost(hostname,domain,path,allowed)
+  checkPathByHostname(hostname,domain)
   cache.hosts[hostname].paths[domain][path] =
     { value   = allowed
     , changed = "set"
