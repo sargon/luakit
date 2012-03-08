@@ -12,7 +12,6 @@ local util    = require "lockdown.util"
 local add_binds = add_binds
 local add_cmds = add_cmds
 local new_mode = new_mode
-local tostring = tostring
 
 local buf = lousy.bind.buf
 local cmd = lousy.bind.cmd
