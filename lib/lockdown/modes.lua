@@ -64,26 +64,85 @@ new_mode("lockdown_tracked_requests", {
 
         -- Build domain/hosts + paths list
         for domain,paths in pairs(record.requestRecord[view]) do
-            local isDomain = cache.getDomain(domain)
-            table.insert(rows, { string.format("<span foreground=\"%s\">%s</span>",util.boolToColor(isDomain ~= nil and isDomain.value),domain)
-                               , ""  
-                               , domain = domain
-                               } 
-                        )
+            local function domainCol()
+              local isDomain = cache.getDomain(domain)
+              local isDomainByHost = cache.getDomainByHost(hostname,domain)
+              return string.format("<span foreground=\"%s\">%s</span>"
+                                  , util.boolToColor( isDomain ~= nil and isDomain.value
+                                                    or isDomainByHost ~= nil and isDomainByHost.value
+                                                    )
+                                  , domain
+                                  )
+            end
+            local function domainColString()
+              local isDomain = cache.getDomain(domain)
+              local isDomainByHost = cache.getDomainByHost(hostname,domain)
+              local domainString = ""
+
+              if isDomain and isDomain.value ~= nil then
+                if isDomain.value then
+                  domainString = "+domain"
+                else
+                  domainString = "-domain"
+                end
+              end
+
+              if isDomainByHost and isDomainByHost.value ~= nil then 
+                if isDomainByHost.value then
+                  domainString = domainString .. " +domain by host"
+                else 
+                  domainString = domainString .. " -domain by host"
+                end
+              end
+
+              return domainString
+            end
+            table.insert(rows, { domainCol , domainColString, domain = domain} )
             for path,accessReq in pairs(paths) do
               local function pathCol()
-                local accessReq = record.getRequest(view,accessReq.request)
+                local isPath       = cache.getPath(domain,path)
+                local isPathByHost = cache.getPathByHost(hostname,domain,path)
                 return string.format(" <span foreground=\"%s\">%s</span>"
-                                    ,util.boolToColor(accessReq.result)
+                                    ,util.boolToColor( isPath ~= nil and isPath.value
+                                                     or isPathByHost ~= nil and isPathByHost.value
+                                                     or accessReq.reason.defaults
+                                                     )
                                     ,path
                                     )
               end
+              local function pathColReason()
+                local isPath       = cache.getPath(domain,path)
+                local isPathByHost = cache.getPathByHost(hostname,domain,path)
+
+                local pathString = ""
+
+                if isPath and isPath.value ~= nil then
+                  if isPath.value then
+                    pathString = "+path"
+                  else
+                    pathString = "-path"
+                  end
+                end
+
+                if isPathByHost and isPathByHost.value ~= nil then 
+                  if isPathByHost.value then
+                    pathString = pathString .. " +path by host"
+                  else 
+                    pathString = pathString .. " -path by host"
+                  end
+                end
+
+                if accessReq.reason.defaults then
+                  pathString = pathString .. " +defaults"
+                end
+                return pathString
+              end
               table.insert(rows, {pathCol
-                               , "" 
-                               , domain  = domain, path = path
-                               , request = accessReq.request
-                               , result  = accessReq.result
-                               })
+                                 , pathColReason
+                                 , domain  = domain, path = path
+                                 , request = accessReq.request
+                                 , result  = accessReq.result
+                                 })
             end
         end
         wv.menu:build(rows)
