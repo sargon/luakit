@@ -136,3 +136,18 @@ function togglePathWhiteList(hostname,domain,path)
     end
   end
 end
+
+function toggleDomainWhiteList(hostname,domain)
+  local valDomain       = getDomain(domain)
+  local valDomainByHost = getDomainByHost(hostname,domain)
+  if valDomain and valDomain.value then
+      resetDomain(domain,path)
+  else
+    if valDomainByHost and valDomainByHost.value then
+      resetDomainByHost(hostname,domain)
+      setDomain(domain, true)
+    else
+      setDomainByHost(hostname,domain,true)
+    end
+  end
+end
