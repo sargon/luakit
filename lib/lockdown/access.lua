@@ -64,8 +64,8 @@ function evaluate(hostname,requestURI)
   -- Cached values
   local isDomain = cache.getDomain(domain)
   local isPath = cache.getPath(domain,path)
-  local isDomainByHost = cache.getDomainByHost(host,domain)
-  local isPathByHost = cache.getPathByHost(host,domain,path)
+  local isDomainByHost = cache.getDomainByHost(hostname,domain)
+  local isPathByHost = cache.getPathByHost(hostname,domain,path)
 
   -- ALLOW ------------------------------------------------
 
@@ -94,7 +94,7 @@ function evaluate(hostname,requestURI)
   end
 
   -- Path
-  if isDomain ~= nil and not isPath.value then
+  if isDomain ~= nil and not isDomain.value then
     requestCommit = false
     accessReason.path = false
   end
@@ -120,13 +120,13 @@ function evaluate(hostname,requestURI)
   -- DENY Host --------------------------------------------
 
   -- DomainByHost
-  if isDomainByHost ~= nil and isDomainByHost.value then
+  if isDomainByHost ~= nil and not isDomainByHost.value then
     requestCommit = false
     accessReason.domainByHost = false
   end
 
   -- PathByHost
-  if isPathByHost ~= nil and isPathByHost.value then
+  if isPathByHost ~= nil and not isPathByHost.value then
     requestCommit = false
     accessReason.pathByHost = false
   end
