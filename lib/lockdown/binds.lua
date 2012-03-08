@@ -13,7 +13,10 @@ local add_binds = add_binds
 local add_cmds = add_cmds
 local new_mode = new_mode
 local tostring = tostring
+
+local buf = lousy.bind.buf
 local cmd = lousy.bind.cmd
+local key = lousy.bind.key
 
 module "lockdown.binds"
 
@@ -25,7 +28,6 @@ add_cmds({
 })
 
 -- Add additional binds to downloads menu mode.
-local key = lousy.bind.key
 add_binds("lockdown_tracked_requests", lousy.util.table.join({
     key({}, "w" , function (w)
       local row = w.menu:get()
@@ -65,3 +67,11 @@ add_binds("lockdown_tracked_requests", lousy.util.table.join({
     key({},  "q", function (w) w:set_mode() end),
 
 }, menu_binds))
+
+
+-- normal mode binds
+add_binds("normal", {
+  buf("^ga$", function (w)  
+    w:set_mode("lockdown_tracked_requests") 
+  end),
+})
