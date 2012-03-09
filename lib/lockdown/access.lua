@@ -5,9 +5,6 @@
 --
 local cache = require "lockdown.cache"
 local util = require "lockdown.util"
-local assert = assert
-
-local lousy   = require "lousy"
 
 module "lockdown.access"
 
@@ -23,6 +20,16 @@ config =
   -- allow plugins
   , defaultAllowPlugins       = false
 }
+
+local function match(cacheResult,value)
+  return cacheResult ~= nil 
+     and cacheResult.value ~= nil
+     and cacheResult.value == value
+end
+
+local function notCached(cacheResult) 
+  return cacheResult == nil
+end
 
 function evaluate(hostname,requestURI)
 
@@ -70,31 +77,35 @@ function evaluate(hostname,requestURI)
   -- ALLOW ------------------------------------------------
 
   -- Domain 
-  if isDomain ~= nil and isDomain.value then
+  if match(isDomain,true) then
     requestCommit = true
     accessReason.domain = true
   else
+    if notCached(isDomain) then
     -- TODO database lookup
+    end
   end
 
   -- Path
-  if isPath ~= nil and isPath.value then
+  if match(isPath,true) then
     requestCommit = true
     accessReason.path = true
   else 
+    if notCached(isPath) then
     -- TODO database lookup
+    end
   end
 
   -- DENY -------------------------------------------------
   
   -- Domain 
-  if isDomain ~= nil and not isDomain.value then
+  if match(isDomain,false)  then
     requestCommit = false
     accessReason.domain = false
   end
 
   -- Path
-  if isDomain ~= nil and not isDomain.value then
+  if match(isPath,false) then
     requestCommit = false
     accessReason.path = false
   end
@@ -102,31 +113,35 @@ function evaluate(hostname,requestURI)
   -- ALLOW Host -------------------------------------------
  
   -- DomainByHost
-  if isDomainByHost ~= nil and isDomainByHost.value then
+  if match(isDomainByHost,true) then
     requestCommit = true
     accessReason.domainByHost = true
   else 
+    if notCached(isDomainByHost) then
     -- TODO database lookup
+    end
   end
 
   -- PathByHost
-  if isPathByHost ~= nil and isPathByHost.value then
+  if match(isPathByHost,true) then
     requestCommit = true
     accessReason.pathByHost = true
-  else 
+  else
+    if notCached(isPathByHost) then
     -- TODO database lookup
+    end
   end
 
   -- DENY Host --------------------------------------------
 
   -- DomainByHost
-  if isDomainByHost ~= nil and not isDomainByHost.value then
+  if match(isDomainByHost,false) then
     requestCommit = false
     accessReason.domainByHost = false
   end
 
   -- PathByHost
-  if isPathByHost ~= nil and not isPathByHost.value then
+  if match(isPathByHost,false) then
     requestCommit = false
     accessReason.pathByHost = false
   end
