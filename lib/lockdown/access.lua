@@ -27,6 +27,10 @@ local function match(cacheResult,value)
      and cacheResult.value == value
 end
 
+local function notCached(cacheResult) 
+  return cacheResult == nil
+end
+
 function evaluate(hostname,requestURI)
 
   local uri       = util.uriParse(requestURI)
@@ -77,7 +81,9 @@ function evaluate(hostname,requestURI)
     requestCommit = true
     accessReason.domain = true
   else
+    if notCached(isDomain) then
     -- TODO database lookup
+    end
   end
 
   -- Path
@@ -85,7 +91,9 @@ function evaluate(hostname,requestURI)
     requestCommit = true
     accessReason.path = true
   else 
+    if notCached(isPath) then
     -- TODO database lookup
+    end
   end
 
   -- DENY -------------------------------------------------
@@ -109,15 +117,19 @@ function evaluate(hostname,requestURI)
     requestCommit = true
     accessReason.domainByHost = true
   else 
+    if notCached(isDomainByHost) then
     -- TODO database lookup
+    end
   end
 
   -- PathByHost
   if match(isPathByHost,true) then
     requestCommit = true
     accessReason.pathByHost = true
-  else 
+  else
+    if notCached(isPathByHost) then
     -- TODO database lookup
+    end
   end
 
   -- DENY Host --------------------------------------------
