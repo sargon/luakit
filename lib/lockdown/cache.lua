@@ -122,32 +122,48 @@ function resetPath(domain,path)
     }
 end
 
-function togglePathWhiteList(hostname,domain,path)
+function togglePath(hostname,domain,path,toggle)
   local valPath       = getPath(domain,path)
   local valPathByHost = getPathByHost(hostname,domain,path)
-  if valPath and valPath.value then
+  if valPath and valPath.value == toggle then
       resetPath(domain,path)
   else
-    if valPathByHost and valPathByHost.value then
+    if valPathByHost and valPathByHost.value == toggle then
       resetPathByHost(hostname,domain,path)
-      setPath(domain,path, true)
+      setPath(domain,path, toggle)
     else
-      setPathByHost(hostname,domain,path,true)
+      setPathByHost(hostname,domain,path,toggle)
     end
   end
 end
 
-function toggleDomainWhiteList(hostname,domain)
+function toggleDomain(hostname,domain,toggle)
   local valDomain       = getDomain(domain)
   local valDomainByHost = getDomainByHost(hostname,domain)
-  if valDomain and valDomain.value then
+  if valDomain and valDomain.value == toggle then
       resetDomain(domain,path)
   else
-    if valDomainByHost and valDomainByHost.value then
+    if valDomainByHost and valDomainByHost.value == toggle then
       resetDomainByHost(hostname,domain)
-      setDomain(domain, true)
+      setDomain(domain, toggle)
     else
-      setDomainByHost(hostname,domain,true)
+      setDomainByHost(hostname,domain,toggle)
     end
   end
+end
+
+function togglePathWhiteList(hostname,domain,path)
+  togglePath(hostname,domain,path,true)
+end
+
+function toggleDomainWhiteList(hostname,domain)
+  toggleDomain(hostname,domain,true)
+end
+
+function togglePathBlackList(hostname,domain,path)
+  togglePath(hostname,domain,path,false)
+end
+
+function toggleDomainBlackList(hostname,domain)
+  toggleDomain(hostname,domain,false)
 end
