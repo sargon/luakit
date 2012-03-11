@@ -28,15 +28,6 @@ add_cmds({
 
 -- Add additional binds to downloads menu mode.
 add_binds("lockdown_tracked_requests", lousy.util.table.join({
-    key({}, "w" , function (w)
-      local row = w.menu:get()
-      if row and row.domain then
-        local hostname = w.view.uri
-        local domain   = row.domain
-        local accessReq = access.evaluate(hostname,domain)
-       --lockdown_set_domain_whitelisted(row.domain)
-      end
-    end),
     key({}, "t", function(w) 
       local row = w.menu:get()
       if row and row.script then
@@ -45,6 +36,9 @@ add_binds("lockdown_tracked_requests", lousy.util.table.join({
       if row and row.plugin then
         w:toggle_plugins(false)
       end
+    end),
+    key({}, "w" , function (w)
+      local row = w.menu:get()
       if row and row.domain then
         local hostURI  = w.view.uri
         local uri      = util.uriParse(w.view.uri)
@@ -58,6 +52,25 @@ add_binds("lockdown_tracked_requests", lousy.util.table.join({
           record.addRequest(w.view,row.request,accessRes)
         else 
           cache.toggleDomainWhiteList(hostname,domain)
+        end
+      end
+      w.menu:update()
+    end),
+    key({}, "b" , function (w)
+      local row = w.menu:get()
+      if row and row.domain then
+        local hostURI  = w.view.uri
+        local uri      = util.uriParse(w.view.uri)
+        local domain   = row.domain 
+        local hostname = util.getHostname(uri) 
+
+        if row.path and row.request then
+          local path = row.path
+          cache.togglePathBlackList(hostname,domain,path)
+          local accessRes = access.evaluate(hostURI,row.request)
+          record.addRequest(w.view,row.request,accessRes)
+        else 
+          cache.toggleDomainBlackList(hostname,domain)
         end
       end
       w.menu:update()
